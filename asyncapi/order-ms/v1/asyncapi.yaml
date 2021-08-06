@@ -1,0 +1,98 @@
+asyncapi: '2.0.0'
+info:
+  version: '1.0.0'
+  title: order-ms
+  description: This is an example how to implement a document specification using Async API.
+  contact:
+    name: Sensedia Impact
+    url: https://sensedia.com
+    email: leonardo.americo@sensedia.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+defaultContentType: application/json
+servers:
+  dev:
+    url: localhost:9092
+    protocol: kafka
+    protocolVersion: '1.0.0'
+    description: Basic usage at localhost kafka
+    security:
+      - user-password: []
+
+channels:
+  order-ms/tp-order-to-be-qualified:
+    publish:
+      operationId: publishOrderToBeQualified
+      message:
+        $ref: '#/components/messages/MessageOrderToBeQualified'
+  qualify-ms/sub-order-qualified:
+    subscribe:
+      operationId: subscribeOrderQualified
+      message:
+        $ref: '#/components/messages/MessageQualifiedOrder'
+components:
+  securitySchemes:
+    user-password:
+      type: userPassword
+  messages:
+    MessageQualifiedOrder:
+      payload:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+            description: transaction id
+          statusId:
+            type: integer
+            format: int32
+            description: Order status
+            enum:
+              - 1
+              - 2
+              - 3
+          statusDescription:
+            type: string
+            description: Order friendly status
+            maxLength: 200
+            enum:
+              - pending
+              - error
+              - approved
+          timestamp:
+            type: string
+            format: date-time
+            description: Return timestamp
+
+    MessageOrderToBeQualified:
+      payload:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+            description: transaction id
+          zipcode:
+            type: string
+            description: zipcode
+            maxLength: 10
+          emailFormat:
+            type: string
+            format: email
+            description: Email of the user
+          timestamp:
+            type: string
+            format: date-time
+            description: current timestamp
+          password:
+            type: string
+            format: password
+            description: user password
+          age:
+            type: integer
+            format: int32
+            minimum: 1
+            maximum: 200
+        required:
+          - userName
